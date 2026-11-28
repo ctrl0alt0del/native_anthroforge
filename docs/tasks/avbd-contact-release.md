@@ -13,7 +13,7 @@ The user selected no vertex elimination and asked to finish the full project. In
 
 ## Decisions and relevant files
 
-- D1 — Confirmed by user: no dynamic sleeping, inherited sleeping, geometric activity masks, or vertex elimination in production. Keep all existing skin vertices active.
+- D1 — Confirmed by user: no dynamic sleeping, inherited sleeping or experimental SCP activity masks. Keep the SCP skin fully active; preserve the existing VCP boundary conditions.
 - D2 — Native ownership: canonical GPU sorting and candidate allocation belong to the AVBD native contact pipeline. Preserve canonical contact order, force state, conservative motion bounds, fallback processing, and the existing 2 GiB owned GPU limit. Tests cover key boundaries, buffer budget cases, numerical parity, and native telemetry.
 - D3 — Initial-radius policy: use a typed radius initialization setting in the local SCP solver profile, not application environment-variable switches. Preserve the established root initialization and fixed-radius VCP behavior; use the measured `0.0065` adaptive start for subsequent local SCP additions. Test a fresh root and every stage in the complete document.
 - D4 — Candidate sizing: prefer eight candidates per contact, bounded by the shared memory estimator and existing capacity contract. Large or constrained cases may retain a smaller supported candidate buffer; a larger preferred buffer must not defeat the GPU ownership limit.
@@ -56,6 +56,27 @@ processing has not started. Hard-linked diagnostic files survive worker cleanup 
 `full-project/diagnostics/afskin-kgvzb7n3`. Run `progress.py` or inspect `authoring.jsonl`
 and `exit.json` in the local task folder before resuming; do not start a duplicate solve.
 
+The first complete packaged attempt accepted all 58 bones in 1,236.24 s of stage wall
+time (20 min 36 s), with two already-clear muscles, then exposed an existing VCP limit:
+its unbatched contact path rejected more than 32,768 physical vertices. The failed worker
+and every accepted checkpoint were retained; Authoring saved the partial checkpoint
+document (`complete-result.anthroforgex`, despite that harness filename, is not a complete
+skin result). End-to-end attempt wall time was 1,307.53 s.
+
+D7 — Contact-key ownership is shared by batched SCP and unbatched VCP execution. Initialize
+the same compact/base/full-width policy before selecting storage. Retain signed 32-bit
+vertex-ID bounds and all capacity/geometry checks. The exact formerly failing muscle input
+now completes 63 frames in 12.80 s, reaches the full pose and passes native containment,
+crossing, clearance, self-intersection and degeneracy checks. No muscle radius, mobility,
+material or acceptance policy changed. A native-worker continuation using the explicit
+accepted 58-bone/two-muscle fixture is running under `muscles-v2`; it has passed 10 muscles
+so far. This is numerical qualification, not a bypass of packaged runtime identities.
+Runtime v2 packaging is in progress; complete fresh packaged qualification remains pending.
+
+The normal GUI v1 control rebuilt the small bone-and-muscle document, reached current
+state, saved `gui/generation-probe.anthroforge`, and was closed. It must be repeated for
+the final runtime. The saved screenshot and accessibility evidence are in `gui/v1-generation.*`.
+
 ## Verification
 
 Passed: native compilation, targeted policy tests, four successful parity/geometry/resource
@@ -64,8 +85,12 @@ are within 15 physical lines (50 after orchestration/report additions). Python s
 checks, six native CTests, native style and PowerShell checks pass. The combined gate hit
 the known absent worktree-local Qt SDK path; its remaining stages resumed using the
 installed SDK explicitly. QML validation passes (187 files, 46 model types, zero API
-errors); the complete pytest suite is in progress. Pending: full-document completion,
-remaining development checks, GUI generation, promotion and source archive verification.
+errors). The full pytest run finished with 3,026 passes and one access violation from the
+unchanged tetrahedralization subprocess in the X/INSTANT topology case. Its entire six-test
+module passed when rerun separately (97.55 s); numerical import checks and native doctor
+also pass. Do not describe the initial suite as clean or claim that dependency crash is
+fixed. Pending: complete muscle qualification, fresh full-document validation, final GUI
+generation, promotion and source archive verification.
 
 ## Next actions and blockers
 

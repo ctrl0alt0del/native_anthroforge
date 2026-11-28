@@ -79,7 +79,7 @@
      if(groups)sample_bone_queries<<<blocks(groups),128>>>(d,escape.data,demand.data,radius);
      auto estimate=demand.download(1).front();
      size_t needed=std::max(estimate.contacts,(estimate.candidates+3)/4);
-@@ -34,11 +34,20 @@
+@@ -34,11 +34,22 @@
      return fit_contact_cache(std::max(needed+needed/10,host.restart.contacts.size()),
                               cache_workspace(memory,page,host.shell),page,host.shell);
  }
@@ -90,10 +90,13 @@
 +    return int(bounded_candidate_slots(capacity,page,baseline,budget,sizeof(Candidate)));
 +}
 +
- void Pipeline::allocate_batch_contacts() {
-     f.key_base=bone_contact_base(host.positions.size());
--    capacity=planned_contact_slots(); first.resize(capacity); second.resize(capacity); raw.resize(capacity);
++void Pipeline::initialize_contact_keys() {
++    f.key_base=bone_contact_base(host.positions.size());
 +    f.full_key_sort=host.positions.size()>32768&&!f.key_base;
++}
+ void Pipeline::allocate_batch_contacts() {
+-    f.key_base=bone_contact_base(host.positions.size());
+-    capacity=planned_contact_slots(); first.resize(capacity); second.resize(capacity); raw.resize(capacity);
 +    capacity=planned_contact_slots(); int candidate_slots=planned_candidate_slots();
 +    first.resize(capacity); second.resize(capacity); raw.resize(capacity);
      planes.resize(capacity); incident.resize(4ULL*capacity);
@@ -102,7 +105,7 @@
      keys_in.resize(capacity); keys_out.resize(capacity); index_in.resize(capacity); index_out.resize(capacity);
      check(cudaStreamCreateWithFlags(&stream,cudaStreamNonBlocking));
      batches=std::make_unique<ContactBatches>(memory,host,capacity,stream);
-@@ -48,7 +57,7 @@
+@@ -48,7 +59,7 @@
      size_t scan_bytes=0;
      index_init<<<blocks(capacity),128,0,stream>>>(index_in.data,capacity);
      check(cub::DeviceRadixSort::SortPairs(nullptr,scratch_bytes,keys_in.data,keys_out.data,
@@ -111,7 +114,7 @@
      check(cub::DeviceScan::ExclusiveSum(nullptr,scan_bytes,incidence_counts.data,scanned.data,host.shell+1,stream));
      scratch_bytes=std::max(scratch_bytes,scan_bytes); scratch.resize(scratch_bytes);
  }
-@@ -62,7 +71,7 @@
+@@ -62,7 +73,7 @@
      initial.count[initial.epoch&1]=int(r.contacts.size()); state.upload({initial});
  }
  void Pipeline::refresh_batches() {
@@ -153,11 +156,25 @@
      void audit_groups();
 -    void allocate_frame_buffers(); int candidate_capacity() const;
 +    void allocate_frame_buffers(); int candidate_capacity() const; int planned_candidate_slots() const;
-+    void full_key_sort(int count); void sort_contact_indices(int count);
++    void initialize_contact_keys(); void full_key_sort(int count); void sort_contact_indices(int count);
      void spatial(); void query_contacts(); void sorted_contacts(int count=-1); void incidence(); Stats run(); Stats collect_stats(); void capture();
      void begin_phase(const char*); void end_phase(); void profile(std::ofstream&);
      void initialize_sack(); void sack_color(); void start_bone(int,const std::vector<Vec>&);
-@@ -346,7 +348,7 @@
+@@ -270,12 +272,10 @@
+ #endif
+ }
+ void Pipeline::initialize_positions() {
+-    auto physical_vertices=host.positions.size();
++    if(host.positions.size()>size_t(INT_MAX)) throw std::runtime_error("Contact vertex IDs exceed signed 32-bit range");
+ #ifdef AF_CONTAINMENT_REPAIR
+-    physical_vertices-=host.containment_spare;
+     repair_updates.resize(host.containment_spare);
+ #endif
+-    if(physical_vertices>32768&&!batches_enabled()) throw std::runtime_error("Compact keys require <=32768 vertices");
+     positions.upload(host.positions); old.upload(host.positions); frame.upload(host.positions); prediction.upload(host.positions);
+ }
+ void Pipeline::initialize() {
+@@ -346,7 +346,7 @@
      target_data={target_free.data,target_response.data,target_contacts.data,target_vertices.data};
  }
  int Pipeline::candidate_capacity() const {
@@ -166,7 +183,15 @@
  #ifdef AF_RECOVERY_TRIAL
      if(diffeomorphic_requested()&&std::getenv("AF_DIFFEO_RESERVE")) return 4*AF_GRAPH_CONTACT_CAPACITY;
      if(host.recovery.candidate_capacity) return host.recovery.candidate_capacity;
-@@ -434,11 +436,25 @@
+@@ -360,6 +360,7 @@
+     return host.contact_capacity?host.contact_capacity:AF_GRAPH_CONTACT_CAPACITY;
+ }
+ void Pipeline::allocate_contacts() {
++    initialize_contact_keys();
+     if(batches_enabled()) { allocate_batch_contacts(); return; }
+     capacity=contact_capacity();
+     if(capacity<1024||capacity>AF_GRAPH_CONTACT_CAPACITY) throw std::runtime_error("Invalid contact capacity");
+@@ -434,11 +435,25 @@
          candidate_contacts<<<256,128,0,stream>>>(f);
      } else queries<<<blocks(f.d.query_count),128,0,stream>>>(f);
  }

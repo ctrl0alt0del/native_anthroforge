@@ -4105,3 +4105,11 @@ tests showed no net speed gain. No activity masks are introduced. The applicatio
 owns checkpoint lifecycle and validates every required stage; runtime content identities
 invalidate incompatible old prefixes. The [release record](tasks/avbd-contact-release.md)
 retains the exact source delta, evidence and remaining qualification limits.
+
+The first full packaged model accepted all 58 SCP stages (1,236.24 s) but the first VCP
+requiring deformation exposed the unbatched path's separate 32,768-vertex guard. Key-policy
+initialization now precedes storage selection, so both paths use the same full tuple order
+when compact keys cannot represent the mesh. Signed 32-bit vertex-ID validation remains.
+The exact failed VCP fixture completes 63 frames in 12.80 s and passes its native geometric
+audit; its fixed radius, existing regional boundary conditions and acceptance rules remain.
+Complete muscle and final release qualification are still pending.

@@ -230,6 +230,63 @@
      int capacity=AF_GRAPH_CONTACT_CAPACITY;
      int candidate_capacity=AF_GRAPH_CONTACT_CAPACITY;
  #ifdef AF_VCP_CLEARANCE
+--- a/tools/experiments/avbd_envelope/io.hpp
++++ b/tools/experiments/avbd_envelope/io.hpp
+@@ -1,5 +1,7 @@
+ #pragma once
+ #include "model.hpp"
++#include "input_count.hpp"
++#include <filesystem>
+ 
+ namespace experiment {
+ template<class T> inline void read_values(std::ifstream& stream,T* values,size_t count) {
+@@ -20,7 +22,7 @@
+ inline std::vector<Mesh> read_inputs(const std::string& path) {
+     std::ifstream stream(path,std::ios::binary);
+     int count=0; read_values(stream,&count,1);
+-    if(count<1||count>64) throw std::runtime_error("Invalid bone count");
++    validate_input_count(count,std::filesystem::file_size(path));
+     std::vector<Mesh> result;
+     for(int i=0;i<count;++i) result.push_back(read_mesh(stream));
+     return result;
+--- a/tools/experiments/avbd_envelope/spatial_attraction_audit.cpp
++++ b/tools/experiments/avbd_envelope/spatial_attraction_audit.cpp
+@@ -1,6 +1,8 @@
+ // Indexed, read-only shape comparison in source coordinates.
+ #define AF_FOLD_AUDIT_NO_MAIN
+ #include "ulna_fold_audit.cpp"
++#include "input_count.hpp"
++#include <limits>
+ #include <Eigen/Core>
+ #include <igl/AABB.h>
+ namespace spatial_audit {
+@@ -25,9 +27,11 @@
+ }
+ inline void load_bones(Bones& b,const std::string& path) {
+     std::ifstream in(path,std::ios::binary); int count=0; in.read(reinterpret_cast<char*>(&count),4);
+-    if(!in||count<1||count>64) throw std::runtime_error("Invalid bone count");
+-    std::vector<Mesh> meshes; int vertices=0,faces=0;
++    if(!in) throw std::runtime_error("Truncated collider input");
++    experiment::validate_input_count(count,std::filesystem::file_size(path));
++    std::vector<Mesh> meshes; std::int64_t vertices=0,faces=0;
+     for(int i=0;i<count;++i) { meshes.push_back(read_bone(in)); vertices+=meshes.back().points.rows(); faces+=meshes.back().faces.rows(); }
++    if(vertices>std::numeric_limits<int>::max()||faces>std::numeric_limits<int>::max()) throw std::runtime_error("Collider indices exceed signed 32-bit range");
+     b.mesh={Rows(vertices,3),Faces(faces,3)}; int v=0,f=0;
+     for(int i=0;i<count;++i) {
+         auto& m=meshes[i]; b.mesh.points.middleRows(v,m.points.rows())=m.points;
+--- a/tools/experiments/avbd_envelope/cuda_graph_runtime.cu
++++ b/tools/experiments/avbd_envelope/cuda_graph_runtime.cu
+@@ -1063,8 +1063,10 @@
+ void final_shape_audit(fast::Pipeline& p,const char* folder) {
+     if(!p.shape_attraction||!std::getenv("AF_SHAPE_FORCE_AUDIT")) return;
+     fast::shape_force_audit(p.f,*p.shape_attraction,p.memory,p.stream,p.host.shell,folder);
++#if defined(AF_CONTAINMENT_AUDIT) || defined(AF_RECOVERY_TRIAL)
+     if(p.containment_audit.capacity) containment_audit_forces(p,std::string(folder)+"/last-sweep");
+     if(p.containment_audit.capacity) containment_audit_blockers(p,std::string(folder)+"/last-sweep");
++#endif
+ }
+ void execute_frames(fast::Pipeline& p,void* opaque,Publish publish,const char* folder) {
+     const Host& host=p.host; fast::metadata(p,folder); afexperiment::write_avbd_settings(p.f.d.avbd,folder);
 --- a/tools/experiments/avbd_envelope/contact_key_parts.hpp
 +++ b/tools/experiments/avbd_envelope/contact_key_parts.hpp
 @@ -0,0 +1,7 @@
@@ -269,4 +326,19 @@
 +    size_t minimum=minimum_candidate_slots(contacts,page);
 +    size_t preferred=std::max(size_t(8)*contacts,size_t(page));
 +    return minimum+std::min(preferred-minimum,(budget-baseline_bytes)/stride);
++}
+--- a/tools/experiments/avbd_envelope/input_count.hpp
++++ b/tools/experiments/avbd_envelope/input_count.hpp
+@@ -0,0 +1,12 @@
++#pragma once
++#include <cstdint>
++#include <stdexcept>
++
++namespace experiment {
++inline void validate_input_count(int count,std::uintmax_t bytes) {
++    constexpr auto header=sizeof(std::int32_t);
++    constexpr auto minimum_mesh=2*header+3*sizeof(double)+3*header;
++    if(count<1||bytes<header||std::uintmax_t(count)>(bytes-header)/minimum_mesh)
++        throw std::runtime_error("Invalid collider count for input size");
++}
 +}

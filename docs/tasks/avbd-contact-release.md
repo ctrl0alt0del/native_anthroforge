@@ -95,6 +95,29 @@ The normal GUI v1 control rebuilt the small bone-and-muscle document, reached cu
 state, saved `gui/generation-probe.anthroforge`, and was closed. It must be repeated for
 the final runtime. The saved screenshot and accessibility evidence are in `gui/v1-generation.*`.
 
+The v2 full-project attempt has now stopped after 58 bones and 190 accepted muscles
+(4,272.42 s end to end). Muscle index 190, `Deltoid.L normal transfer test`, has 70
+nearby collider meshes, including previously accepted muscles. The native input reader
+had an old, arbitrary 64-mesh cap and rejected it before solving. Its saved
+`full-project-final/complete-result.anthroforgex` is therefore another partial checkpoint
+document, not the final result. All diagnostics and accepted stages are preserved.
+
+D8 — Replace the 64-collider parser cap with a bound derived from actual input byte size,
+while preserving positive counts, per-mesh dimension/index/finiteness checks and truncated
+input rejection. The spatial audit uses the same count validator and explicitly checks
+combined signed 32-bit index bounds. Geometry and solve settings do not change. Native
+tests cover 1/64/65/70/323 meshes, exact geometry preservation, invalid counts and truncated
+payloads. Rebuild all 20 packaged targets whose recorded Ninja dependencies include this
+reader, plus the spatial audit. The exact failed input is replaying while these targets
+compile. Pending: remainder qualification and fresh final packaged full-project validation;
+runtime identity rules must not be bypassed to reuse incompatible application prefixes.
+
+D9 — Rebuilding every reader caller exposed an existing compile error in the legacy
+containment worker: optional audit fields/functions were referenced when their feature
+macros were disabled. Guard those final diagnostic calls with the same
+`AF_CONTAINMENT_AUDIT || AF_RECOVERY_TRIAL` condition as their declarations and include.
+This restores both build configurations without changing enabled diagnostics or solving.
+
 ## Verification
 
 Passed: native compilation, targeted policy tests, four successful parity/geometry/resource

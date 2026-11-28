@@ -4113,3 +4113,16 @@ when compact keys cannot represent the mesh. Signed 32-bit vertex-ID validation 
 The exact failed VCP fixture completes 63 frames in 12.80 s and passes its native geometric
 audit; its fixed radius, existing regional boundary conditions and acceptance rules remain.
 Complete muscle and final release qualification are still pending.
+
+The second full packaged attempt accepted all 58 bones and 190 muscle instances, then
+exposed a separate input-reader limit at the deltoid: 70 nearby collider meshes were
+rejected by a historical 64-mesh cap. Colliders include previously accepted muscles as
+well as bones. Count validation now bounds the declared count against actual file bytes
+using the smallest allowed mesh record, retaining positive counts and all existing
+per-mesh dimension, finite-coordinate, index and truncation checks. The spatial audit
+uses the shared validator and checks combined signed 32-bit index bounds before merging.
+This changes input admission, not numerical settings or geometric acceptance. Tests cover
+64/65/70/323 meshes and malformed input. The previously accepted large-muscle fixture
+remains byte-identical for positions, triangles, velocity and contacts; the 70-collider
+fixture now reaches solving but needs the existing fill fallback to pass clearance.
+All affected workers are being rebuilt; complete full-project validation remains pending.

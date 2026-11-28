@@ -82,8 +82,13 @@ packaged executable (PID recorded in `full-project-final/process.json`, initiall
 Diagnostics are retained in `full-project-final/diagnostics/afskin-ndrs650c`.
 Use `final_progress.py`, `full-project-final/authoring.jsonl`, `stderr.log` and `exit.json`
 to resume monitoring. Do not start another solve. Changed runtime fingerprints correctly
-invalidate old application prefixes; the final run rebuilds from the root. It has accepted
-four bone stages at this checkpoint. Final package hash/import verification is also running.
+invalidate old application prefixes; the final run rebuilds from the root. All 58 bone
+stages are now accepted in 895.73 s of stage wall time (14 min 56 s). All four numerical
+checkpoint files for every bone are byte-identical to v1. Native audits report zero
+self-intersections, outside vertices, crossings and degenerate faces; radius guard
+violations are zero, and maximum owned GPU bytes are 2,113,992,300 (below 2 GiB).
+Forty of 265 muscle instances are accepted at this checkpoint. Final v2 package
+verification passes all 8,536 file hashes/sizes and 1,166 isolated imports.
 
 The normal GUI v1 control rebuilt the small bone-and-muscle document, reached current
 state, saved `gui/generation-probe.anthroforge`, and was closed. It must be repeated for
@@ -93,7 +98,7 @@ the final runtime. The saved screenshot and accessibility evidence are in `gui/v
 
 Passed: native compilation, targeted policy tests, four successful parity/geometry/resource
 cases and explicit insufficient-workspace rejection. Forty changed/test/harness functions
-are within 15 physical lines (50 after orchestration/report additions). Python static
+are within 15 physical lines (69 after orchestration/report/final-audit additions). Python static
 checks, six native CTests, native style and PowerShell checks pass. The combined gate hit
 the known absent worktree-local Qt SDK path; its remaining stages resumed using the
 installed SDK explicitly. QML validation passes (187 files, 46 model types, zero API

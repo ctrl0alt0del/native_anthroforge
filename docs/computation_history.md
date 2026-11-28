@@ -4079,3 +4079,29 @@ Converting it into quad budgets or a silently inferred triangle count was reject
 those are separate quantities. Editing the independent runtime checkout or using an ambient
 environment override was avoided. UI controls now separate Draft initialization from the
 document/subtree topology allocation. Evidence and limits: [task record](tasks/skin-count-controls.md).
+
+## CH-102 — Full-active AVBD contact execution (2026-11-28)
+
+The large-mesh contact path previously lost cached GPU refresh when a packed 64-bit key
+could not hold all four vertex IDs. Two stable 64-bit radix passes now preserve the full
+canonical tuple order, including duplicate contacts, without staging contact records on
+the host for each refresh. Candidate capacity prefers eight entries per contact instead
+of four and is bounded by the existing shared workspace estimate and 2 GiB ownership
+limit. Explicit contact-cache requests that cannot fit still fail. Both sorting and
+allocation are linear in the number of contact/candidate entries for fixed key width.
+
+Adaptive initialization remains 0.03 for root construction. Later local SCP additions
+start at the measured 0.0065 through a typed radius setting. Existing motion guards,
+adaptive updates, convergence, geometric acceptance, contact transfer and fixed 0.012
+muscle clearance behavior remain. The smaller search start changes the solve trajectory;
+it is not claimed byte-equivalent to the original 0.03 trajectory. GPU sorting/buffer
+changes at the same radius reproduce positions, faces, velocities and contacts exactly
+on Fibula, Radius and finger inputs. The measured prototype reduced the matched Fibula
+solve from 165.62 s to 4.18 s; release replay passed geometry and guard checks in 4.78 s
+during concurrent development checks. Full-document qualification is still pending.
+
+Vertex elimination, dynamic sleeping and inherited sleeping were rejected after combined
+tests showed no net speed gain. No activity masks are introduced. The application still
+owns checkpoint lifecycle and validates every required stage; runtime content identities
+invalidate incompatible old prefixes. The [release record](tasks/avbd-contact-release.md)
+retains the exact source delta, evidence and remaining qualification limits.

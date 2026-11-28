@@ -24,11 +24,29 @@ The user selected no vertex elimination and asked to finish the full project. In
 
 Prior isolated tests showed approximately 166 to 4.18 seconds on the same Fibula seed with smaller adaptive startup radius, full-width GPU contact keys, and an eight-times candidate buffer. The native bone chain completed all additions; muscle stages and the persistent app worker remain unqualified. Sleeping follow-up tests did not show a net gain and are excluded.
 
-No production kernel changes or complete-project build have yet been qualified in this task. Existing application and native runtime work must remain intact during implementation.
+Native production changes compile for both packaged workers. Host policy tests cover
+200,032 randomized/duplicate/boundary contact keys, candidate budget bounds and invalid
+inputs, and root/local/fixed radius isolation. Matched Fibula, Radius and finger seeds
+reproduce the verified optimized positions, faces, velocities and contact states byte for
+byte. Geometry audits pass, radius guard violations are zero, and owned GPU memory stays
+below 2 GiB. Fibula took 4.78 s during concurrent application checks; this is qualification,
+not a new isolated speedup claim. A 2.3-million-contact cache selects 16,927,730 candidates
+instead of its preferred 18.4 million and passes the same parity/geometry checks. An
+explicit 2.8-million cache on this large fixture cannot fit and is rejected before allocation.
+
+The source delta and portable host checks are preserved in
+[`avbd-contact-release/`](avbd-contact-release/README.md). They apply to the exact local
+runtime baseline, not to the older tracked native branch alone. The complete baseline and
+delta will be retained in the shipped `avbd-sources.zip`. Application release packaging
+and its full development gate are running; full-document and GUI qualification are pending.
 
 ## Verification
 
-Pending: targeted native policy tests, parity and resource checks, complete document through Authoring, representative app regression tests, clean-environment bundled-runtime verification, normal GUI launch, release promotion and source archive verification.
+Passed: native compilation, targeted policy tests, four successful parity/geometry/resource
+cases and explicit insufficient-workspace rejection. Forty changed/test/harness functions
+are within 15 physical lines. Pending: complete document through Authoring, application
+development gate, clean-environment bundle verification, normal GUI launch, promotion and
+source archive verification.
 
 ## Next actions and blockers
 

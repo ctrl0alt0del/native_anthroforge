@@ -1,0 +1,247 @@
+--- a/tools/experiments/avbd_envelope/radius_types.hpp
++++ b/tools/experiments/avbd_envelope/radius_types.hpp
+@@ -1,11 +1,19 @@
+ #pragma once
++#include <cmath>
++#include <stdexcept>
+ namespace afcuda {
+ struct RadiusMotion {
+     double raw=0,plane=0,accepted=0,lost=0,ratio=0;
+     unsigned long long caps=0,planes=0,violations=0;
+     int raw_id=-1,plane_id=-1;
+ };
+-struct RadiusSettings { double fixed=.03,minimum=.01; bool adaptive=false,observe=true; };
++struct RadiusSettings { double fixed=.03,minimum=.01; bool adaptive=false,observe=true; double initial=.03; };
++inline double initial_contact_radius(const RadiusSettings& settings) {
++    double value=settings.adaptive?settings.initial:settings.fixed;
++    if(!std::isfinite(value)||value<=0) throw std::runtime_error("Invalid initial contact radius");
++    return value;
++}
++
+ struct RadiusControl {
+     double active=.03,low_max=0,minimum=.01; int lows=0,records=0,capacity=0;
+     bool adaptive=false,window_valid=false; RadiusMotion window;
+--- a/tools/experiments/avbd_envelope/cuda_radius_runtime.cuh
++++ b/tools/experiments/avbd_envelope/cuda_radius_runtime.cuh
+@@ -12,16 +12,19 @@
+ #endif
+         return .03;
+     }
+-    void initialize() {
++    void validate_configuration() {
+ #ifdef AF_VCP_CLEARANCE
+         if((host.restart.enabled||host.sack.mechanical_batches!=1)&&(host.radius.adaptive||host.radius.observe))
+ #else
+         if(host.restart.enabled||host.sack.mechanical_batches!=1)
+ #endif
+             throw std::runtime_error("Radius trial requires fixed bones and one frame batch");
++    }
++    void initialize() {
++        validate_configuration();
+         int colors=int(host.color_offsets.size())-1; limit=1+(6*colors-1)/5;
+         if(surface_spacing_option()) limit+=6;
+-        RadiusControl s; s.active=host.radius.adaptive?.03:host.radius.fixed; s.adaptive=host.radius.adaptive; s.capacity=limit;
++        RadiusControl s; s.active=initial_contact_radius(host.radius); s.adaptive=host.radius.adaptive; s.capacity=limit;
+         s.minimum=host.radius.minimum;
+         if(!(s.minimum>.005&&s.minimum<=s.active&&s.active<=maximum_radius())) throw std::runtime_error("Invalid runtime radius");
+         state.upload({s}); blocks_buffer.upload(std::vector<RadiusMotion>(blocks(host.shell))); records.resize(limit);
+--- a/tools/experiments/avbd_envelope/local_skin_replay.hpp
++++ b/tools/experiments/avbd_envelope/local_skin_replay.hpp
+@@ -61,9 +61,10 @@
+     skin_material(h,{input,vertices,faces,old,skin_length_ratio(seed)},output);
+ }
+ 
+-inline void skin_solver_profile(afcuda::Host& h,int capacity) {
++inline void skin_solver_profile(afcuda::Host& h,int capacity,bool continuation) {
+     flow_tightening_profile(h,4*capacity);
+     h.recovery.capacity=capacity;
++    if(continuation) h.radius.initial=.0065;
+     h.frames=int(recovery_parameter("AF_SPATIAL_TRACE_FRAMES",h.frames,1,h.frames));
+ }
+ 
+@@ -71,7 +72,7 @@
+                          const std::string& seed,const std::string& output) {
+     Run r;
+     auto h=iteration_host(r,input,state,false,int(input.bones.size()));
+-    skin_solver_profile(h,input.contact_capacity);
++    skin_solver_profile(h,input.contact_capacity,input.original.mesh.current.rows()!=0);
+     auto checkpoint=output+"/relaxation";
+     std::filesystem::create_directories(checkpoint);
+     skin_apply_metrics(h,input,fixture+"/parent/relaxation",seed,checkpoint);
+--- a/tools/experiments/avbd_envelope/contact_batch_runtime.cuh
++++ b/tools/experiments/avbd_envelope/contact_batch_runtime.cuh
+@@ -26,7 +26,7 @@
+     d.queries=queries_buffer.data; d.query_count=int(host.queries.size());
+     Buffer<BoneDemand> demand(memory); demand.upload({BoneDemand{}});
+     int groups=(d.query_count+bone_sample_stride-1)/bone_sample_stride;
+-    double radius=host.radius.adaptive?.03:host.radius.fixed;
++    double radius=initial_contact_radius(host.radius);
+     if(groups)sample_bone_queries<<<blocks(groups),128>>>(d,escape.data,demand.data,radius);
+     auto estimate=demand.download(1).front();
+     size_t needed=std::max(estimate.contacts,(estimate.candidates+3)/4);
+@@ -34,11 +34,20 @@
+     return fit_contact_cache(std::max(needed+needed/10,host.restart.contacts.size()),
+                              cache_workspace(memory,page,host.shell),page,host.shell);
+ }
++int Pipeline::planned_candidate_slots() const {
++    int page=contact_page_slots();
++    size_t baseline=contact_cache_bytes(capacity,page,host.shell);
++    size_t budget=cache_workspace(memory,page,host.shell);
++    return int(bounded_candidate_slots(capacity,page,baseline,budget,sizeof(Candidate)));
++}
++
+ void Pipeline::allocate_batch_contacts() {
+     f.key_base=bone_contact_base(host.positions.size());
+-    capacity=planned_contact_slots(); first.resize(capacity); second.resize(capacity); raw.resize(capacity);
++    f.full_key_sort=host.positions.size()>32768&&!f.key_base;
++    capacity=planned_contact_slots(); int candidate_slots=planned_candidate_slots();
++    first.resize(capacity); second.resize(capacity); raw.resize(capacity);
+     planes.resize(capacity); incident.resize(4ULL*capacity);
+-    candidates.resize(std::max(size_t(4)*capacity,size_t(contact_page_slots())));
++    candidates.resize(candidate_slots);
+     keys_in.resize(capacity); keys_out.resize(capacity); index_in.resize(capacity); index_out.resize(capacity);
+     check(cudaStreamCreateWithFlags(&stream,cudaStreamNonBlocking));
+     batches=std::make_unique<ContactBatches>(memory,host,capacity,stream);
+@@ -48,7 +57,7 @@
+     size_t scan_bytes=0;
+     index_init<<<blocks(capacity),128,0,stream>>>(index_in.data,capacity);
+     check(cub::DeviceRadixSort::SortPairs(nullptr,scratch_bytes,keys_in.data,keys_out.data,
+-        index_in.data,index_out.data,capacity,0,f.key_base?64:61,stream));
++        index_in.data,index_out.data,capacity,0,(f.key_base||f.full_key_sort)?64:61,stream));
+     check(cub::DeviceScan::ExclusiveSum(nullptr,scan_bytes,incidence_counts.data,scanned.data,host.shell+1,stream));
+     scratch_bytes=std::max(scratch_bytes,scan_bytes); scratch.resize(scratch_bytes);
+ }
+@@ -62,7 +71,7 @@
+     initial.count[initial.epoch&1]=int(r.contacts.size()); state.upload({initial});
+ }
+ void Pipeline::refresh_batches() {
+-    if(batches->resident&&(host.positions.size()<=32768||f.key_base)) {
++    if(batches->resident&&(host.positions.size()<=32768||f.key_base||f.full_key_sort)) {
+         if(batch_cached_refresh()) return;
+     } else batch_refit();
+     batches->refresh(f);
+--- a/tools/experiments/avbd_envelope/bone_contact_budget.cuh
++++ b/tools/experiments/avbd_envelope/bone_contact_budget.cuh
+@@ -1,4 +1,5 @@
+ // Count a stratified sample of the initial, fixed-bone geometry for memory planning only.
++#include "contact_candidate_budget.hpp"
+ struct BoneDemand { unsigned long long candidates=0, contacts=0; };
+ constexpr unsigned bone_sample_stride=32;
+ __device__ inline bool near_contact(Device d, const Query& q, const Node& n, double radius) {
+@@ -36,7 +37,7 @@
+     check(cub::DeviceRadixSort::SortPairs(nullptr,radix,keys,keys,ids,ids,slots));
+     check(cub::DeviceScan::ExclusiveSum(nullptr,scan,ids,ids,shell+1));
+     size_t stride=3*sizeof(Force)+sizeof(Plane)+6*sizeof(uint64_t)+2*sizeof(int);
+-    return size_t(slots)*stride+std::max(size_t(4)*slots,size_t(page))*sizeof(Candidate)
++    return size_t(slots)*stride+minimum_candidate_slots(slots,page)*sizeof(Candidate)
+         +std::max(radix,scan);
+ }
+ inline size_t cache_workspace(const Memory& memory,int page,int shell) {
+--- a/tools/experiments/avbd_envelope/envelope_batched_runtime.cu
++++ b/tools/experiments/avbd_envelope/envelope_batched_runtime.cu
+@@ -3,6 +3,7 @@
+ #include "contact_batch_store.cuh"
+ #include "cuda_memory.cuh"
+ #include "cuda_graph_solve.cuh"
++#include "contact_full_keys.cuh"
+ #include "recovery_order_probe.cuh"
+ #include "containment_motion.cuh"
+ #include "containment_fold_filter.cuh"
+@@ -207,7 +208,8 @@
+     void initialize(); void initialize_positions(); void allocate_contacts(); int contact_capacity() const; void pointers(); void setup_graph(); void refresh(); void color(int); void step();
+     void initialize_groups(); bool grouped_color(int); int color_count() const;
+     void audit_groups();
+-    void allocate_frame_buffers(); int candidate_capacity() const;
++    void allocate_frame_buffers(); int candidate_capacity() const; int planned_candidate_slots() const;
++    void full_key_sort(int count); void sort_contact_indices(int count);
+     void spatial(); void query_contacts(); void sorted_contacts(int count=-1); void incidence(); Stats run(); Stats collect_stats(); void capture();
+     void begin_phase(const char*); void end_phase(); void profile(std::ofstream&);
+     void initialize_sack(); void sack_color(); void start_bone(int,const std::vector<Vec>&);
+@@ -346,7 +348,7 @@
+     target_data={target_free.data,target_response.data,target_contacts.data,target_vertices.data};
+ }
+ int Pipeline::candidate_capacity() const {
+-    if(batches) return 4*capacity;
++    if(batches) return int(candidates.capacity);
+ #ifdef AF_RECOVERY_TRIAL
+     if(diffeomorphic_requested()&&std::getenv("AF_DIFFEO_RESERVE")) return 4*AF_GRAPH_CONTACT_CAPACITY;
+     if(host.recovery.candidate_capacity) return host.recovery.candidate_capacity;
+@@ -434,11 +436,25 @@
+         candidate_contacts<<<256,128,0,stream>>>(f);
+     } else queries<<<blocks(f.d.query_count),128,0,stream>>>(f);
+ }
++void Pipeline::full_key_sort(int count) {
++    index_init<<<blocks(count),128,0,stream>>>(index_in.data,count);
++    full_contact_keys<<<blocks(count),128,0,stream>>>(f,index_in.data,keys_in.data,count,0);
++    check(cub::DeviceRadixSort::SortPairs(scratch.data,scratch_bytes,keys_in.data,
++        keys_out.data,index_in.data,index_out.data,count,0,64,stream));
++    full_contact_keys<<<blocks(count),128,0,stream>>>(f,index_out.data,keys_in.data,count,1);
++    check(cub::DeviceRadixSort::SortPairs(scratch.data,scratch_bytes,keys_in.data,
++        keys_out.data,index_out.data,index_in.data,count,0,64,stream));
++    check(cudaMemcpyAsync(index_out.data,index_in.data,count*sizeof(int),cudaMemcpyDeviceToDevice,stream));
++}
++void Pipeline::sort_contact_indices(int count) {
++    if(f.full_key_sort) { full_key_sort(count); return; }
++    check(cub::DeviceRadixSort::SortPairs(scratch.data,scratch_bytes,keys_in.data,
++        keys_out.data,index_in.data,index_out.data,count,0,f.key_base?64:61,stream));
++}
+ void Pipeline::sorted_contacts(int count) {
+     begin_phase("sort_bind");
+     if(count<0)count=capacity;
+-    if(count)check(cub::DeviceRadixSort::SortPairs(scratch.data,scratch_bytes,keys_in.data,
+-        keys_out.data,index_in.data,index_out.data,count,0,f.key_base?64:61,stream));
++    if(count) sort_contact_indices(count);
+     check(cudaMemsetAsync(incidence_counts.data,0,(host.shell+1)*sizeof(int),stream));
+     bind<<<256,128,0,stream>>>(f);
+     end_phase();
+--- a/tools/experiments/avbd_envelope/cuda_graph_contacts.cuh
++++ b/tools/experiments/avbd_envelope/cuda_graph_contacts.cuh
+@@ -21,7 +21,7 @@
+ struct Candidate { int query=0,node=0; };
+ struct State { int epoch=-1,count[2]{},broad=0,error=0,candidates=0,candidate_peak=0; uint64_t visits=0; };
+ struct Data {
+-    uint64_t key_base=0;
++    uint64_t key_base=0; bool full_key_sort=false;
+     int capacity=AF_GRAPH_CONTACT_CAPACITY;
+     int candidate_capacity=AF_GRAPH_CONTACT_CAPACITY;
+ #ifdef AF_VCP_CLEARANCE
+--- a/tools/experiments/avbd_envelope/contact_key_parts.hpp
++++ b/tools/experiments/avbd_envelope/contact_key_parts.hpp
+@@ -0,0 +1,7 @@
++#pragma once
++namespace afcuda {
++AF_HD inline uint64_t full_contact_key_part(const Force& force,int part) {
++    if(part==0) return (uint64_t(force.key[3])<<32)|uint32_t(force.key[4]);
++    return (uint64_t(force.key[0])<<62)|(uint64_t(force.key[1])<<31)|uint32_t(force.key[2]);
++}
++}
+--- a/tools/experiments/avbd_envelope/contact_full_keys.cuh
++++ b/tools/experiments/avbd_envelope/contact_full_keys.cuh
+@@ -0,0 +1,10 @@
++#pragma once
++#include "contact_key_parts.hpp"
++namespace afcuda::fast {
++__global__ void full_contact_keys(Data f,const int* order,uint64_t* keys,int count,int part) {
++    int at=blockIdx.x*blockDim.x+threadIdx.x;
++    if(at>=count) return;
++    int id=order[at],size=min(f.state->count[f.state->epoch&1],f.capacity);
++    keys[at]=id<size?full_contact_key_part(f.raw[id],part):UINT64_MAX;
++}
++}
+--- a/tools/experiments/avbd_envelope/contact_candidate_budget.hpp
++++ b/tools/experiments/avbd_envelope/contact_candidate_budget.hpp
+@@ -0,0 +1,14 @@
++#pragma once
++#include <algorithm>
++#include <cstddef>
++#include <stdexcept>
++inline size_t minimum_candidate_slots(int contacts,int page) {
++    if(contacts<=0||page<=0) throw std::runtime_error("Invalid contact cache capacity");
++    return std::max(size_t(4)*contacts,size_t(page));
++}
++inline size_t bounded_candidate_slots(int contacts,int page,size_t baseline_bytes,size_t budget,size_t stride) {
++    if(!stride||baseline_bytes>budget) throw std::runtime_error("Insufficient CUDA contact cache workspace");
++    size_t minimum=minimum_candidate_slots(contacts,page);
++    size_t preferred=std::max(size_t(8)*contacts,size_t(page));
++    return minimum+std::min(preferred-minimum,(budget-baseline_bytes)/stride);
++}
